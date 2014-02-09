@@ -179,7 +179,7 @@ function steamtracks_curl($method, $getfields = array(), $postfields = array(), 
 		$getfields = implode('&', $getfields);
 	}
 	else if($postfields){
-		$postfields['payload'] = urlencode($data_string);
+		$postfields['payload'] = $data_string;
 	}
 	
 	//CONSTRUCT THE FINAL URL
