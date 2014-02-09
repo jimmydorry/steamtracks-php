@@ -1,4 +1,6 @@
 <?php
+require_once('./connections/parameters.php');
+
 if (!class_exists("dbWrapper")) {
 Class dbWrapper {
     protected $_mysqli;
@@ -152,7 +154,7 @@ function relative_time($time, $output = 'default'){
 }
 
 if (!function_exists("steamtracks_curl")) {
-function steamtracks_curl($method, $getfields = array(), $postfields = array(), $verify_ssl = FALSE){
+function steamtracks_curl($method, $reqest_type = 'GET', $getfields = array(), $postfields = array(), $verify_ssl = FALSE){
 	//WE HAVE TO TURN VERIFICATION OFF BECAUSE FOR SOME REASON THE SSL ON THE API DOES NOT MATCH
 	
 	global $steamtracks_api_key;
@@ -171,29 +173,30 @@ function steamtracks_curl($method, $getfields = array(), $postfields = array(), 
 	$data_string = json_encode($postfields);
 	
 	//WE NEED A API SIGNATURE
-	$api_sig = urlencode(base64_encode(hash_hmac('sha1', $data_string, $api_secret, 1)));
+	$api_sig = urlencode(base64_encode(hash_hmac('sha1', $data_string, $steamtracks_api_secret, 1)));
 	
 	//HANDLE THE GET FIELDS
-	if($getfields){
+	if($reqest_type == 'GET'){
 		$getfields[] = 'payload=' . urlencode($data_string);
-		$getfields = implode('&', $getfields);
+		$getfields_url = implode('&', $getfields);
 	}
-	else if($postfields){
+	else if($reqest_type == 'POST'){
 		$postfields['payload'] = $data_string;
 	}
 	
 	//CONSTRUCT THE FINAL URL
-	if($getfields){
-		$api_url = $api_url . '?' . $getfields;
+	if($reqest_type == 'GET'){
+		$api_url = $api_url . '?' . $getfields_url;
 	}
 	
 	echo 'API URL: '.$api_url.'<hr />';
 
-	echo 'Payload: '; print_r($postfields); echo '<hr />';
+	echo 'GET: '; print_r($getfields); echo '<hr />';
+	echo 'POST: '; print_r($postfields); echo '<hr />';
 	
 	//SET THE REQUIRED HEADERS
 	$headers = array( 
-		"SteamTracks-Key: " . $api_key,
+		"SteamTracks-Key: " . $steamtracks_api_key,
 		"SteamTracks-Signature: " . $api_sig,
 		"ACCEPT: application/json",
 		"Content-Type: application/json" 
@@ -214,7 +217,7 @@ function steamtracks_curl($method, $getfields = array(), $postfields = array(), 
 	}
 	
 	//HANDLE THE POST FIELDS
-	if($postfields){
+	if($reqest_type == 'POST'){
 		curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
 	}

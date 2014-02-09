@@ -18,7 +18,7 @@ if(!empty($token) && !empty($steam_id)){
 	$accept_request_postfields = array(
 							'token' => $token,
 							'user' => $steam_id);
-	$accept_request = steamtracks_curl('signup/ack', NULL, $accept_request_postfields);
+	$accept_request = steamtracks_curl('signup/ack', 'POST', NULL, $accept_request_postfields);
 	
 	var_dump($accept_request);
 }
