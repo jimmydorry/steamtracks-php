@@ -14,7 +14,7 @@ if(isset($_GET['page']) && is_numeric($_GET['page'])){
 	$page = $_GET['page'];
 }
 else{
-	header("Location: ./?page=1");
+	header("Location: ./users.php?page=1");
 }
 
 $users_response = $steamtracks->users($page);
